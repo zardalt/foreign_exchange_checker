@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: JetBrains;
+  src: url("/fonts/JetBrainsMono-VariableFont_wght.ttf") format(truetype);
+  font-style: normal;
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: JetBrains;
+  src: url("/fonts/JetBrainsMono-Italic-VariableFont_wght.ttf") format(truetype);
+  font-style: italic;
+  font-weight: 100 900;
+}
+
+@theme {
+  --color-neutral-900: #0a0a0a;
+  --color-neutral-700: #171719;
+  --color-neutral-500: #2e2e2e;
+  --color-neutral-200: #9d9d9d;
+  --color-neutral-50: #fff;
+  --color-lime-500: #cef739;
+  --color-green-500: #42eb05;
+  --color-red-500: #ff4141;
+
+  --default-font-family: JetBrains;
+}
+
+@layer base {
+  body {
+    background-color: black;
+    color: white;
+  }
+}
+
+@utility text-preset-6 {
+  font-weight: 400;
+  font-size: 0.625em;
+  line-height: 100%;
+  letter-spacing: 0px;
+}

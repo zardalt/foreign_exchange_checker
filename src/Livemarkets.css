@@ -1,0 +1,11 @@
+.negative {
+  &::before {
+    content: "▼ ";
+  }
+}
+
+.positive {
+  &::before {
+    content: "▲ ";
+  }
+}
