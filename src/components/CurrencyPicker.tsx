@@ -1,57 +1,25 @@
-import React, { useRef } from "react";
-import { currencyImgTable, type CurrencyAbbr } from "../types/currency";
+import React, { Suspense, use, useRef } from "react";
+import { CURRENCIES, POPULAR_CURRENCIES, type CurrencyAbbr } from "../currency";
+import { fetchJsonData } from "../util";
+import { ErrorBoundary } from "react-error-boundary";
 
 type CurrencyPickerProp = {
   anchorName: string;
   id: string;
   selectedCurrency: CurrencyAbbr;
-  setSelectedCurrency: React.Dispatch<React.SetStateAction<CurrencyAbbr>>;
+  setSelectedCurrency: (iso_code: CurrencyAbbr) => void;
 };
 
 type Currency = {
   name: string;
-  abbr: keyof typeof currencyImgTable;
+  iso_code: CurrencyAbbr;
 };
-
-const MOCK_POPULAR_CURRENCIES: Currency[] = [
-  {
-    name: "US Dollar",
-    abbr: "USD",
-  },
-  {
-    name: "Euro",
-    abbr: "EUR",
-  },
-  {
-    name: "British Pound",
-    abbr: "GBP",
-  },
-] as const;
-
-const MOCK_OTHER_CURRENCIES: Currency[] = [
-  {
-    name: "UAE Dirham",
-    abbr: "AED",
-  },
-  {
-    name: "Argentine Peso",
-    abbr: "ARS",
-  },
-  {
-    name: "Australian Dollar",
-    abbr: "AUD",
-  },
-  {
-    name: "Bangladesh Taka",
-    abbr: "BDT",
-  },
-] as const;
 
 type CurrencyGroupProp = {
   groupTitle: string;
   currencies: Currency[];
   selectedCurrency: CurrencyAbbr;
-  setCurrency: (abbr: CurrencyAbbr) => void;
+  setCurrency: (iso_code: CurrencyAbbr) => void;
 };
 
 const CurrencyGroup: React.FC<CurrencyGroupProp> = ({
@@ -72,22 +40,22 @@ const CurrencyGroup: React.FC<CurrencyGroupProp> = ({
           <button
             className={
               "w-full flex items-center gap-x-3 px-2 py-3 rounded-sm" +
-              (selectedCurrency === currency.abbr
+              (selectedCurrency === currency.iso_code
                 ? " bg-no-repeat bg-[url(/images/check.svg)] bg-size-[0.75rem] bg-position-[calc(100%_-_0.5rem)_50%]"
                 : "")
             }
             key={crypto.randomUUID()}
-            aria-checked={currency.abbr === selectedCurrency}
-            onClick={() => setCurrency(currency.abbr)}
+            aria-checked={currency.iso_code === selectedCurrency}
+            onClick={() => setCurrency(currency.iso_code)}
             type="button"
           >
             <img
               className="size-5 rounded-full"
-              src={`/flags/${currencyImgTable[currency.abbr]}.webp`}
+              src={`/flags/${currency.iso_code.substring(0, 2).toLowerCase()}.webp`}
               alt=""
             />
             <span className="text-preset-4 text-neutral-50">
-              {currency.abbr}
+              {currency.iso_code}
             </span>
             <span className="text-preset-5 text-neutral-200">
               {currency.name}
@@ -99,7 +67,18 @@ const CurrencyGroup: React.FC<CurrencyGroupProp> = ({
   );
 };
 
-const CurrencyPicker: React.FC<CurrencyPickerProp> = ({
+const LoadingButton = () => (
+  <button
+    className="flex items-center p-2.5 gap-x-2 rounded-lg bg-neutral-500 border border-neutral-400 *:block *:bg-neutral-400 *:animate-pulse"
+    type="button"
+  >
+    <span className="size-5 rounded-full"></span>
+    <span className="h-4 w-7"></span>
+    <span className="size-3"></span>
+  </button>
+);
+
+const InitCurrencyPicker: React.FC<CurrencyPickerProp> = ({
   anchorName,
   id,
   selectedCurrency,
@@ -107,24 +86,31 @@ const CurrencyPicker: React.FC<CurrencyPickerProp> = ({
 }) => {
   const currencyPopover = useRef<HTMLDivElement | null>(null);
 
-  function setCurrency(abbr: CurrencyAbbr) {
-    if (selectedCurrency === abbr) return;
+  function setCurrency(iso_code: CurrencyAbbr) {
+    if (selectedCurrency === iso_code) return;
 
-    setSelectedCurrency(abbr);
+    setSelectedCurrency(iso_code);
     currencyPopover.current?.hidePopover();
   }
+
+  const popularCurrencies = POPULAR_CURRENCIES.map((iso_code) => {
+    return use(fetchJsonData(`/currency/${iso_code}`)) as Currency;
+  });
+  const otherCurrencies: Currency[] = CURRENCIES.map((iso_code) => {
+    return use(fetchJsonData(`/currency/${iso_code}`)) as Currency;
+  });
 
   return (
     <>
       <button
-        className="flex gap-x-2 items-center text-preset-4 py-2.5 ps-2.5 pe-7.5 bg-neutral-500 border border-neutral-400 rounded-lg text-neutral-50 bg-no-repeat bg-center bg-[url(/images/chevron_down.svg)] bg-position-[calc(100%-0.625em)_50%]"
+        className="flex gap-x-2 items-center text-preset-4 py-2.5 ps-2.5 pe-7.5 bg-neutral-500 border border-neutral-400 rounded-lg text-neutral-50 bg-no-repeat bg-center bg-[url(/images/chevron_down.svg)] bg-position-[calc(100%-0.625em)_50%] hover:bg-neutral-400 transition-colors focus-visible:outline-shadow-lime-500"
         popoverTarget={id}
         type="button"
         style={{ anchorName }}
       >
         <img
           className="w-5 rounded-full"
-          src={`/flags/${currencyImgTable[selectedCurrency]}.webp`}
+          src={`/flags/${selectedCurrency.substring(0, 2).toLowerCase()}.webp`}
           alt=""
         />
         {selectedCurrency}
@@ -152,19 +138,39 @@ const CurrencyPicker: React.FC<CurrencyPickerProp> = ({
         <div className="space-y-1">
           <CurrencyGroup
             groupTitle="Popular"
-            currencies={MOCK_POPULAR_CURRENCIES}
+            currencies={popularCurrencies}
             selectedCurrency={selectedCurrency}
             setCurrency={setCurrency}
           />
           <CurrencyGroup
             groupTitle="Other Currencies"
-            currencies={MOCK_OTHER_CURRENCIES}
+            currencies={otherCurrencies}
             selectedCurrency={selectedCurrency}
             setCurrency={setCurrency}
           />
         </div>
       </div>
     </>
+  );
+};
+
+const CurrencyPicker: React.FC<CurrencyPickerProp> = ({
+  anchorName,
+  id,
+  selectedCurrency,
+  setSelectedCurrency,
+}) => {
+  return (
+    <ErrorBoundary fallback={<p>An error occured</p>}>
+      <Suspense fallback={<LoadingButton />}>
+        <InitCurrencyPicker
+          anchorName={anchorName}
+          id={id}
+          selectedCurrency={selectedCurrency}
+          setSelectedCurrency={setSelectedCurrency}
+        />
+      </Suspense>
+    </ErrorBoundary>
   );
 };
 
