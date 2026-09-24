@@ -16,11 +16,21 @@ export type Log = {
   quoteValue: string;
 };
 
+export type TimePeriod = {
+  duration: 1 | 3 | 5 | 7;
+  unit: "day" | "month" | "year";
+};
+
 const initialValue: CurrencyState = {
   base: "USD",
   quote: "EUR",
   rate: 0.853,
 };
+
+export const timePeriodInitialPeriod = {
+  duration: 1,
+  unit: "month",
+} as TimePeriod;
 
 const set = new Set<string>();
 
@@ -42,4 +52,11 @@ export const ConversionLogsContext = createContext<{
 }>({
   logs: [],
   setLogs: () => {},
+});
+export const TimePeriodContext = createContext<{
+  timePeriod: TimePeriod;
+  setTimePeriod: State<TimePeriod>;
+}>({
+  timePeriod: timePeriodInitialPeriod,
+  setTimePeriod: () => timePeriodInitialPeriod,
 });

@@ -27,7 +27,7 @@ const LogConversionLabel: React.FC<LogConversionLabelProp> = ({
   const { setLogs } = useContext(ConversionLogsContext);
 
   function handleInputChange() {
-    if (isLogged) return;
+    if (isLogged || !baseValue) return;
 
     setLogs((prev) => [
       ...prev,
@@ -120,7 +120,7 @@ const FavoriteLabel: React.FC<FavoriteLabelProp> = ({ base, quote }) => {
           stroke={isFavorited ? "none" : "#FFF"}
         />
       </svg>
-      {isFavorited ? "Favorited" : "Favorite"}
+      {isFavorited ? "Favorited" : "Favorite "}
     </label>
   );
 };

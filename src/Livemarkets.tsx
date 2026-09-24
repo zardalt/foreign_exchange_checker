@@ -1,9 +1,9 @@
 import dayjs from "dayjs";
-import { useEffect, useRef, type FC, Suspense, useContext, use } from "react";
+import { useEffect, useRef, type FC, Suspense, use } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { fetchJsonData, sliceNum } from "./util";
 import "./Livemarkets.css";
-import { CurrencyStateContext } from "./contexts/CurrencyContext";
+import { CURRENCIES, POPULAR_CURRENCIES } from "./currency";
 
 type ExchangeRate = {
   currencyPair: string;
@@ -58,10 +58,32 @@ type LiveRates = {
   rate: number;
 };
 
+const randomCurrencyPairs = (() => {
+  const currencies = [...CURRENCIES, ...POPULAR_CURRENCIES];
+  const randomizedPairs = [];
+
+  const generateCurrency = () =>
+    currencies[Math.floor(Math.random() * currencies.length)];
+
+  for (let i = 0; i < 25; i++) {
+    const _1 = generateCurrency();
+    const _2 = (() => {
+      let pair = generateCurrency();
+      while (pair === _1) {
+        pair = generateCurrency();
+      }
+
+      return pair;
+    })();
+
+    randomizedPairs.push(`${_1}/${_2}`);
+  }
+
+  return randomizedPairs;
+})();
+
 const RatesContainer: FC = () => {
   const rateContainer = useRef<HTMLDivElement | null>(null);
-
-  const currencyState = useContext(CurrencyStateContext);
 
   useEffect(() => {
     function handleWindowResize() {
@@ -93,26 +115,28 @@ const RatesContainer: FC = () => {
   }, []);
 
   const oneMonthAgo = dayjs().subtract(1, "month").format(DATE_FORMAT);
-  const currentRates = use(
-    fetchJsonData<LiveRates[]>(`/rates?base=${currencyState.base}`),
-  );
 
-  const rates = currentRates.slice(0, 50).map((val) => {
-    const prevRate = use(
-      fetchJsonData<LiveRates>(
-        `/rate/${val.base}/${val.quote}?from=${oneMonthAgo}`,
-      ),
-    );
+  const rates: (ExchangeRate & { id: number })[] = randomCurrencyPairs
+    .map((pair, index) => {
+      const currentRate = use(fetchJsonData<LiveRates>(`/rate/${pair}`));
+      const prevRate = use(
+        fetchJsonData<LiveRates>(`/rate/${pair}?from=${oneMonthAgo}`),
+      );
 
-    return {
-      exchangeRate: sliceNum(val.rate),
-      currencyPair: `${val.base}/${val.quote}`,
-      change: sliceNum(
-        (100 * (val.rate - prevRate.rate)) / Math.abs(prevRate.rate),
-      ),
-      id: crypto.randomUUID(),
-    } as ExchangeRate & { id: string };
-  });
+      if (currentRate.rate === undefined || prevRate.rate === undefined)
+        return undefined;
+
+      return {
+        exchangeRate: sliceNum(currentRate.rate),
+        currencyPair: `${currentRate.base}/${currentRate.quote}`,
+        change: sliceNum(
+          (100 * (currentRate.rate - prevRate.rate)) /
+            Math.abs(currentRate.rate),
+        ),
+        id: index,
+      };
+    })
+    .filter((rate) => rate !== undefined);
 
   return (
     <div className="flex shrink-0" ref={rateContainer}>

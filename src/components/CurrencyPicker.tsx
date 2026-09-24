@@ -1,4 +1,4 @@
-import React, { Suspense, use, useRef } from "react";
+import React, { Suspense, use, useRef, useState } from "react";
 import { CURRENCIES, POPULAR_CURRENCIES, type CurrencyAbbr } from "../currency";
 import { fetchJsonData } from "../util";
 import { ErrorBoundary } from "react-error-boundary";
@@ -20,6 +20,7 @@ type CurrencyGroupProp = {
   currencies: Currency[];
   selectedCurrency: CurrencyAbbr;
   setCurrency: (iso_code: CurrencyAbbr) => void;
+  searchTerm: string;
 };
 
 const CurrencyGroup: React.FC<CurrencyGroupProp> = ({
@@ -27,19 +28,30 @@ const CurrencyGroup: React.FC<CurrencyGroupProp> = ({
   currencies,
   selectedCurrency,
   setCurrency,
+  searchTerm,
 }) => {
-  return (
+  const searchRegex = new RegExp(searchTerm, "gi");
+
+  const filteredCurrencies = searchTerm
+    ? currencies.filter(
+        (currency) =>
+          searchRegex.test(currency.name) ||
+          searchRegex.test(currency.iso_code),
+      )
+    : currencies;
+
+  return filteredCurrencies.length ? (
     <div className="space-y-1">
       <div className="flex justify-between items-center p-2 border-b border-b-neutral-500 *:text-preset-5 *:text-neutral-200 *:uppercase">
         <span>{groupTitle}</span>
-        <span>{currencies.length}</span>
+        <span>{filteredCurrencies.length}</span>
       </div>
 
       <div>
-        {currencies.map((currency) => (
+        {filteredCurrencies.map((currency) => (
           <button
             className={
-              "w-full flex items-center gap-x-3 px-2 py-3 rounded-sm" +
+              "w-full flex items-center gap-x-3 px-2 py-3 rounded-sm hover:border-neutral-200 border border-transparent transition-colors focus:border-lime-500 focus:outline-none" +
               (selectedCurrency === currency.iso_code
                 ? " bg-no-repeat bg-[url(/images/check.svg)] bg-size-[0.75rem] bg-position-[calc(100%_-_0.5rem)_50%]"
                 : "")
@@ -57,13 +69,15 @@ const CurrencyGroup: React.FC<CurrencyGroupProp> = ({
             <span className="text-preset-4 text-neutral-50">
               {currency.iso_code}
             </span>
-            <span className="text-preset-5 text-neutral-200">
+            <span className="pe-4 text-preset-5 text-neutral-200">
               {currency.name}
             </span>
           </button>
         ))}
       </div>
     </div>
+  ) : (
+    <div></div>
   );
 };
 
@@ -84,6 +98,7 @@ const InitCurrencyPicker: React.FC<CurrencyPickerProp> = ({
   selectedCurrency,
   setSelectedCurrency,
 }) => {
+  const [searchTerm, setSearchTerm] = useState("");
   const currencyPopover = useRef<HTMLDivElement | null>(null);
 
   function setCurrency(iso_code: CurrencyAbbr) {
@@ -117,12 +132,11 @@ const InitCurrencyPicker: React.FC<CurrencyPickerProp> = ({
       </button>
 
       <div
-        className="overflow-scroll bottom-0 w-full max-w-[19.4375em] rounded-lg space-y-2.5 p-2 pbs-0 bg-neutral-600 border border-neutral-400 shadow-[0_1.25em_3.75_0_rgb(0_0_0/0.5)] starting:scale-0 transition-transform origin-top-right"
+        className="ssm:span-start span-all overflow-scroll bottom-0 w-full max-w-87 max-h-114.5 rounded-lg space-y-2.5 p-2 pbs-0 bg-neutral-600 border border-neutral-400 shadow-[0_1.25em_3.75_0_rgb(0_0_0/0.5)] starting:scale-0 transition-transform origin-top-right"
         popover="auto"
         id={id}
         style={{
           positionAnchor: anchorName,
-          positionArea: "end span-start",
           top: "calc(anchor(bottom) + 0.4em)",
         }}
         ref={currencyPopover}
@@ -132,6 +146,8 @@ const InitCurrencyPicker: React.FC<CurrencyPickerProp> = ({
             className="w-full p-3 ps-9 rounded-[0.375em] border border-neutral-200 text-preset-5 text-neutral-200 bg-[url(/images/search.svg)] bg-position-[0.75em_50%] bg-size-[0.875rem] bg-no-repeat"
             type="text"
             placeholder="Search currencies..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
@@ -141,12 +157,14 @@ const InitCurrencyPicker: React.FC<CurrencyPickerProp> = ({
             currencies={popularCurrencies}
             selectedCurrency={selectedCurrency}
             setCurrency={setCurrency}
+            searchTerm={searchTerm}
           />
           <CurrencyGroup
             groupTitle="Other Currencies"
             currencies={otherCurrencies}
             selectedCurrency={selectedCurrency}
             setCurrency={setCurrency}
+            searchTerm={searchTerm}
           />
         </div>
       </div>
