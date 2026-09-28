@@ -1,11 +1,35 @@
 import React from "react";
 import TimePeriodContainer from "./TimePeriodContainer";
+import { getColors, sliceNum } from "./util";
 
 type ConversionStatProp = {
   title: string;
   value: string;
   color: string;
 };
+
+export function ConversionStatLoading() {
+  return (
+    <>
+      <div className="space-y-4 px-5 py-3 rounded-2xl bg-neutral-700 border border-neutral-600">
+        <p className="text-preset-4 uppercase opacity-70">Open</p>
+        <span className="block h-6 w-20 bg-neutral-600 rounded-lg animate-pulse"></span>
+      </div>
+      <div className="space-y-4 px-5 py-3 rounded-2xl bg-neutral-700 border border-neutral-600">
+        <p className="text-preset-4 uppercase opacity-70">Last</p>
+        <span className="block h-6 w-20 bg-neutral-600 rounded-lg animate-pulse"></span>
+      </div>
+      <div className="space-y-4 px-5 py-3 rounded-2xl bg-neutral-700 border border-neutral-600">
+        <p className="text-preset-4 uppercase opacity-70">Change</p>
+        <span className="block h-6 w-20 bg-neutral-600 rounded-lg animate-pulse"></span>
+      </div>
+      <div className="space-y-4 px-5 py-3 rounded-2xl bg-neutral-700 border border-neutral-600">
+        <p className="text-preset-4 uppercase opacity-70">% Change</p>
+        <span className="block h-6 w-20 bg-neutral-600 rounded-lg animate-pulse"></span>
+      </div>
+    </>
+  );
+}
 
 const ConversionStat: React.FC<ConversionStatProp> = ({
   title,
@@ -27,14 +51,54 @@ const ConversionStat: React.FC<ConversionStatProp> = ({
   );
 };
 
-const StatsContainer: React.FC = () => {
+export function StatsContainerLoading() {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-2.5">
-        <ConversionStat title="Open" value="0.8516" color="#FFF" />
-        <ConversionStat title="Last" value="0.8530" color="#FFF" />
-        <ConversionStat title="Change" value="+0.0014" color="#42eb05" />
-        <ConversionStat title="% Change" value="▲ +0.16%" color="#42eb05" />
+        <ConversionStatLoading />
+      </div>
+      <TimePeriodContainer />
+    </div>
+  );
+}
+
+type StatsContainerProp = {
+  rates: number[];
+};
+
+const StatsContainer: React.FC<StatsContainerProp> = ({ rates }) => {
+  const change = rates.at(-1)! - rates[0],
+    percentageChange = (change / rates.at(-1)!) * 100;
+
+  return (
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-2.5">
+        <ConversionStat
+          title="Open"
+          value={sliceNum(rates[0], 4)}
+          color={getColors("neutral-50")}
+        />
+        <ConversionStat
+          title="Last"
+          value={sliceNum(rates.at(-1)!, 4)}
+          color={getColors("neutral-50")}
+        />
+        <ConversionStat
+          title="Change"
+          value={sliceNum(change, 4)}
+          color={change > 0 ? getColors("green-500") : getColors("red-500")}
+        />
+        <ConversionStat
+          title="% Change"
+          value={
+            (percentageChange > 0 ? "▲ +" : "▼ ") +
+            sliceNum(percentageChange) +
+            "%"
+          }
+          color={
+            percentageChange > 0 ? getColors("green-500") : getColors("red-500")
+          }
+        />
       </div>
       <TimePeriodContainer />
     </div>

@@ -1,7 +1,15 @@
-import React, { Suspense, use, useRef, useState } from "react";
+import React, {
+  Suspense,
+  use,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { CURRENCIES, POPULAR_CURRENCIES, type CurrencyAbbr } from "../currency";
 import { fetchJsonData } from "../util";
 import { ErrorBoundary } from "react-error-boundary";
+import { FetchingContext } from "../contexts/CurrencyContext";
 
 type CurrencyPickerProp = {
   anchorName: string;
@@ -178,15 +186,21 @@ const CurrencyPicker: React.FC<CurrencyPickerProp> = ({
   selectedCurrency,
   setSelectedCurrency,
 }) => {
+  const isFetching = useContext(FetchingContext);
+
   return (
     <ErrorBoundary fallback={<p>An error occured</p>}>
       <Suspense fallback={<LoadingButton />}>
-        <InitCurrencyPicker
-          anchorName={anchorName}
-          id={id}
-          selectedCurrency={selectedCurrency}
-          setSelectedCurrency={setSelectedCurrency}
-        />
+        {isFetching ? (
+          <LoadingButton />
+        ) : (
+          <InitCurrencyPicker
+            anchorName={anchorName}
+            id={id}
+            selectedCurrency={selectedCurrency}
+            setSelectedCurrency={setSelectedCurrency}
+          />
+        )}
       </Suspense>
     </ErrorBoundary>
   );

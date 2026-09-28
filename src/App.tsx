@@ -35,11 +35,12 @@ const CurrencyContext: React.FC<Prop> = ({ children }) => {
   useEffect(() => {
     async function getCurrentRate() {
       setIsFetching(true);
+
       const currentRate = await fetchJsonData<CurrencyState>(
         `/rate/${currencyState.base}/${currencyState.quote}`,
       );
-
       setCurrencyState({ ...currentRate });
+
       setIsFetching(false);
     }
 

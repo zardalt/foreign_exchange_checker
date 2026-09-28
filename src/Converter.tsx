@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import CurrencyPicker from "./components/CurrencyPicker";
 import * as utils from "./util";
 import {
@@ -14,6 +20,7 @@ import Check from "./components/Check";
 type LogConversionLabelProp = Omit<Log, "loggedOn"> & {
   isLogged: boolean;
   setIsLogged: utils.State<boolean>;
+  baseInput: RefObject<HTMLInputElement | null>;
 };
 
 const LogConversionLabel: React.FC<LogConversionLabelProp> = ({
@@ -23,11 +30,17 @@ const LogConversionLabel: React.FC<LogConversionLabelProp> = ({
   quote,
   baseValue,
   quoteValue,
+  baseInput,
 }) => {
   const { setLogs } = useContext(ConversionLogsContext);
 
   function handleInputChange() {
-    if (isLogged || !baseValue) return;
+    if (isLogged) return;
+
+    if (!baseValue) {
+      baseInput.current?.focus();
+      return;
+    }
 
     setLogs((prev) => [
       ...prev,
@@ -61,7 +74,7 @@ const LogConversionLabel: React.FC<LogConversionLabelProp> = ({
         <>Log Conversion</>
       ) : (
         <p className="flex gap-x-2 items-center justify-center normal-case">
-          <Check color="#0a0a0a" />
+          <Check color={utils.getColors("neutral-900")} />
           Logged
         </p>
       )}
@@ -116,8 +129,8 @@ const FavoriteLabel: React.FC<FavoriteLabelProp> = ({ base, quote }) => {
       >
         <path
           d="M7.33248 2.41081C7.61373 1.84831 8.41061 1.87175 8.66842 2.41081L10.2153 5.528L13.6372 6.02019C14.2465 6.11394 14.4809 6.86394 14.0356 7.30925L11.5747 9.72331L12.1606 13.1218C12.2544 13.7311 11.5981 14.1999 11.059 13.9186L8.01217 12.3014L4.94186 13.9186C4.40279 14.1999 3.74654 13.7311 3.84029 13.1218L4.42623 9.72331L1.96529 7.30925C1.51998 6.86394 1.75436 6.11394 2.36373 6.02019L5.80904 5.528L7.33248 2.41081Z"
-          fill={isFavorited ? "#0a0a0a" : "#0A0A0A00"}
-          stroke={isFavorited ? "none" : "#FFF"}
+          fill={isFavorited ? utils.getColors("neutral-900") : "#0A0A0A00"}
+          stroke={isFavorited ? "none" : utils.getColors("neutral-50")}
         />
       </svg>
       {isFavorited ? "Favorited" : "Favorite "}
@@ -256,6 +269,7 @@ const Converter: React.FC = () => {
               quote={currencyState.quote}
               baseValue={sendValue}
               quoteValue={recieveValue}
+              baseInput={sendInput}
             />
           </div>
         </div>
