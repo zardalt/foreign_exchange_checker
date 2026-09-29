@@ -11,9 +11,11 @@ import {
   getColors,
   getRandomCurrencies,
   sliceNum,
+  type State,
 } from "../util";
 import { ErrorBoundary } from "react-error-boundary";
 import type { Currency } from "../components/CurrencyPicker";
+import StarSVG from "../components/StarSVG";
 
 type CompareHeaderProp = {
   currencyState: CurrencyState;
@@ -96,10 +98,9 @@ const CompareCurrenciesLoading = () => {
   );
 };
 
-const CompareCurrencies: React.FC<CompareHeaderProp> = ({
-  currencies,
-  sendValue,
-}) => {
+const CompareCurrencies: React.FC<
+  CompareHeaderProp & { setCurrencyState: State<CurrencyState> }
+> = ({ currencies, sendValue, setCurrencyState }) => {
   const { favorited, setFavorited } = useContext(FavoritedCurrencyPairs);
 
   const currenciesWithName = currencies.map((curr) => {
@@ -117,6 +118,10 @@ const CompareCurrencies: React.FC<CompareHeaderProp> = ({
     );
   };
 
+  const setCurrencies = (curr: CurrencyState) => {
+    setCurrencyState(curr);
+  };
+
   return (
     <div className="space-y-3">
       {currenciesWithName.map((curr) => {
@@ -124,10 +129,10 @@ const CompareCurrencies: React.FC<CompareHeaderProp> = ({
         const isFavorited = favorited.has(pair);
 
         return (
-          <div
-            className="flex gap-x-2.5 p-3 rounded-[0.625em] bg-neutral-600 border border-neutral-500 items-center hover:border-neutral-300 transition-colors focus:outline-shadow-lime-500"
+          <button
+            className="w-full text-left flex gap-x-2.5 p-3 rounded-[0.625em] bg-neutral-600 border border-neutral-500 items-center hover:border-neutral-300 transition-colors focus:outline-shadow-lime-500"
             key={`${curr.base}/${curr.quote}`}
-            tabIndex={0}
+            onClick={() => setCurrencies(curr)}
           >
             <img
               className="size-6 rounded-full"
@@ -146,11 +151,12 @@ const CompareCurrencies: React.FC<CompareHeaderProp> = ({
                 {addCommas(
                   sliceNum(
                     curr.rate * Number((sendValue || "1").split(",").join("")),
+                    4,
                   ),
                 )}
               </p>
               <p className="text-preset-6 text-right text-neutral-200">
-                @ {addCommas(sliceNum(curr.rate))}
+                @ {addCommas(sliceNum(curr.rate, 4))}
               </p>
             </div>
             <button
@@ -161,24 +167,14 @@ const CompareCurrencies: React.FC<CompareHeaderProp> = ({
                 ),
               }}
               aria-checked={isFavorited}
-              onClick={() => toggleIsFavorited(pair)}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleIsFavorited(pair);
+              }}
             >
-              <svg
-                className="inline"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M7.33248 2.41081C7.61373 1.84831 8.41061 1.87175 8.66842 2.41081L10.2153 5.528L13.6372 6.02019C14.2465 6.11394 14.4809 6.86394 14.0356 7.30925L11.5747 9.72331L12.1606 13.1218C12.2544 13.7311 11.5981 14.1999 11.059 13.9186L8.01217 12.3014L4.94186 13.9186C4.40279 14.1999 3.74654 13.7311 3.84029 13.1218L4.42623 9.72331L1.96529 7.30925C1.51998 6.86394 1.75436 6.11394 2.36373 6.02019L5.80904 5.528L7.33248 2.41081Z"
-                  fill={isFavorited ? getColors("lime-500") : "transparent"}
-                  stroke={getColors(isFavorited ? "lime-500" : "neutral-50")}
-                />
-              </svg>
+              <StarSVG isFavorited={isFavorited} />
             </button>
-          </div>
+          </button>
         );
       })}
     </div>
@@ -195,7 +191,7 @@ const CompareTabLoading = () => {
 };
 
 const CompareTab: React.FC = () => {
-  const { currencyState } = useContext(CurrencyStateContext);
+  const { currencyState, setCurrencyState } = useContext(CurrencyStateContext);
   const { sendValue } = useContext(SendValueContext);
 
   const randomCurrencies = getRandomCurrencies(currencyState.base);
@@ -221,6 +217,7 @@ const CompareTab: React.FC = () => {
       />
       <CompareCurrencies
         currencyState={currencyState}
+        setCurrencyState={setCurrencyState}
         currencies={currencies}
         sendValue={sendValue}
       />
