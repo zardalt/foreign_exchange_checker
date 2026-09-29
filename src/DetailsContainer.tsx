@@ -1,8 +1,8 @@
-import React, { Suspense, useState } from "react";
+import React, { useState } from "react";
 import Tabs from "./tabs/Tabs";
-import HistoryTab, { HistoryTabLoading } from "./tabs/HistoryTab";
-import { ErrorBoundary } from "react-error-boundary";
 import { TABS } from "./util";
+import BoundedHistoryTab from "./tabs/HistoryTab";
+import CompareTabWrapped from "./tabs/CompareTab";
 
 const DetailsContainer: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<
@@ -13,11 +13,9 @@ const DetailsContainer: React.FC = () => {
     <div className="space-y-4">
       <Tabs currentTab={currentTab} setCurrentTab={setCurrentTab} />
       {currentTab === TABS.HISTORY ? (
-        <ErrorBoundary fallback={<p>An error occured</p>}>
-          <Suspense fallback={<HistoryTabLoading />}>
-            <HistoryTab />
-          </Suspense>
-        </ErrorBoundary>
+        <BoundedHistoryTab />
+      ) : currentTab === TABS.COMPARE ? (
+        <CompareTabWrapped />
       ) : (
         <p>Not yet implemented</p>
       )}

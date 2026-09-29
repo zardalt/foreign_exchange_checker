@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import {
   ConversionLogsContext,
   CurrencyStateContext,
-  CurrencyUpdateContext,
   FavoritedCurrencyPairs,
   FetchingContext,
+  SendValueContext,
   TimePeriodContext,
   timePeriodInitialPeriod,
   type Log,
@@ -25,6 +25,7 @@ const CurrencyContext: React.FC<Prop> = ({ children }) => {
     quote: "EUR",
     rate: 0.853,
   });
+  const [sendValue, setSendValue] = useState<string>("");
   const [isFetching, setIsFetching] = useState(false);
   const [favorited, setFavorited] = useState(new Set<string>());
   const [loggedConversions, setLoggedConversions] = useState<Log[]>([]);
@@ -48,28 +49,28 @@ const CurrencyContext: React.FC<Prop> = ({ children }) => {
   }, [currencyState.base, currencyState.quote]);
 
   return (
-    <CurrencyStateContext value={currencyState}>
-      <CurrencyUpdateContext value={setCurrencyState}>
-        <FetchingContext value={isFetching}>
-          <FavoritedCurrencyPairs value={{ favorited, setFavorited }}>
-            <ConversionLogsContext
+    <CurrencyStateContext value={{ currencyState, setCurrencyState }}>
+      <FetchingContext value={isFetching}>
+        <FavoritedCurrencyPairs value={{ favorited, setFavorited }}>
+          <ConversionLogsContext
+            value={{
+              logs: loggedConversions,
+              setLogs: setLoggedConversions,
+            }}
+          >
+            <TimePeriodContext
               value={{
-                logs: loggedConversions,
-                setLogs: setLoggedConversions,
+                timePeriod,
+                setTimePeriod,
               }}
             >
-              <TimePeriodContext
-                value={{
-                  timePeriod,
-                  setTimePeriod,
-                }}
-              >
+              <SendValueContext value={{ sendValue, setSendValue }}>
                 {children}
-              </TimePeriodContext>
-            </ConversionLogsContext>
-          </FavoritedCurrencyPairs>
-        </FetchingContext>
-      </CurrencyUpdateContext>
+              </SendValueContext>
+            </TimePeriodContext>
+          </ConversionLogsContext>
+        </FavoritedCurrencyPairs>
+      </FetchingContext>
     </CurrencyStateContext>
   );
 };

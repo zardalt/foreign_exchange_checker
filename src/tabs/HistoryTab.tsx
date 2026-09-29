@@ -1,4 +1,4 @@
-import React, { useContext, use } from "react";
+import React, { useContext, use, Suspense } from "react";
 import StatsContainer, { StatsContainerLoading } from "../StatsContainer";
 import ChartContainer, { ChartContainerLoading } from "../Charts";
 import {
@@ -7,8 +7,9 @@ import {
   type CurrencyState,
 } from "../contexts/CurrencyContext";
 import { getDatesFromRange, fetchJsonData } from "../util";
+import { ErrorBoundary } from "react-error-boundary";
 
-export function HistoryTabLoading() {
+function HistoryTabLoading() {
   return (
     <>
       <StatsContainerLoading />
@@ -19,7 +20,7 @@ export function HistoryTabLoading() {
 
 const HistoryTab: React.FC = () => {
   const { timePeriod } = useContext(TimePeriodContext);
-  const currencyState = useContext(CurrencyStateContext);
+  const { currencyState } = useContext(CurrencyStateContext);
 
   const dates = getDatesFromRange(timePeriod, 50);
   const rates = dates
@@ -45,4 +46,14 @@ const HistoryTab: React.FC = () => {
   );
 };
 
-export default HistoryTab;
+const BoundedHistoryTab = () => {
+  return (
+    <ErrorBoundary fallback={<p>An error occured</p>}>
+      <Suspense fallback={<HistoryTabLoading />}>
+        <HistoryTab />
+      </Suspense>
+    </ErrorBoundary>
+  );
+};
+
+export default BoundedHistoryTab;

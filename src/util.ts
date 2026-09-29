@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { type TimePeriod } from "./contexts/CurrencyContext";
 import { DATE_FORMAT } from "./Livemarkets";
+import { CURRENCIES, POPULAR_CURRENCIES, type CurrencyAbbr } from "./currency";
 
 export const apiUrl = "https://api.frankfurter.dev/v2";
 
@@ -121,3 +122,27 @@ export const TABS = Object.freeze({
   FAVORITES: 2,
   LOG: 3,
 });
+
+export const flattened: CurrencyAbbr[] = [...CURRENCIES, ...POPULAR_CURRENCIES];
+const getRandom = () => Math.floor(Math.random() * flattened.length);
+
+const currencyCache = new Map<string, CurrencyAbbr[]>();
+
+export const getRandomCurrencies = (base: CurrencyAbbr) => {
+  if (currencyCache.has(base)) return currencyCache.get(base)!;
+
+  const currencies: CurrencyAbbr[] = [];
+
+  while (currencies.length !== 10) {
+    const currentCurrency = flattened[getRandom()]!;
+
+    if (currencies.includes(currentCurrency) || currentCurrency === base)
+      continue;
+
+    currencies.push(currentCurrency);
+  }
+
+  currencyCache.set(base, currencies);
+
+  return currencies;
+};

@@ -10,9 +10,9 @@ import * as utils from "./util";
 import {
   ConversionLogsContext,
   CurrencyStateContext,
-  CurrencyUpdateContext,
   FavoritedCurrencyPairs,
   FetchingContext,
+  SendValueContext,
   type Log,
 } from "./contexts/CurrencyContext";
 import Check from "./components/Check";
@@ -139,14 +139,13 @@ const FavoriteLabel: React.FC<FavoriteLabelProp> = ({ base, quote }) => {
 };
 
 const Converter: React.FC = () => {
-  const [sendValue, setSendValue] = useState("");
   const [recieveValue, setRecieveValue] = useState("0");
   const [isLogged, setIsLogged] = useState(false);
 
   const sendInput = useRef<HTMLInputElement | null>(null);
 
-  const currencyState = useContext(CurrencyStateContext);
-  const setCurrencyState = useContext(CurrencyUpdateContext);
+  const { sendValue, setSendValue } = useContext(SendValueContext);
+  const { currencyState, setCurrencyState } = useContext(CurrencyStateContext);
   const isFetching = useContext(FetchingContext);
 
   function submitForm() {

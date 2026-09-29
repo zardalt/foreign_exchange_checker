@@ -34,10 +34,13 @@ export const timePeriodInitialPeriod = {
 
 const set = new Set<string>();
 
-export const CurrencyStateContext = createContext<CurrencyState>(initialValue);
-export const CurrencyUpdateContext = createContext<
-  React.Dispatch<React.SetStateAction<CurrencyState>>
->(() => initialValue);
+export const CurrencyStateContext = createContext<{
+  currencyState: CurrencyState;
+  setCurrencyState: State<CurrencyState>;
+}>({
+  currencyState: initialValue,
+  setCurrencyState: () => initialValue,
+});
 export const FetchingContext = createContext(false);
 export const FavoritedCurrencyPairs = createContext<{
   favorited: Set<string>;
@@ -59,4 +62,11 @@ export const TimePeriodContext = createContext<{
 }>({
   timePeriod: timePeriodInitialPeriod,
   setTimePeriod: () => timePeriodInitialPeriod,
+});
+export const SendValueContext = createContext<{
+  sendValue: string;
+  setSendValue: State<string>;
+}>({
+  sendValue: "",
+  setSendValue: () => "",
 });

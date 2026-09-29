@@ -18,7 +18,7 @@ type CurrencyPickerProp = {
   setSelectedCurrency: (iso_code: CurrencyAbbr) => void;
 };
 
-type Currency = {
+export type Currency = {
   name: string;
   iso_code: CurrencyAbbr;
 };
