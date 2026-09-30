@@ -1,11 +1,4 @@
-import React, {
-  Suspense,
-  use,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { Suspense, use, useContext, useRef, useState } from "react";
 import { CURRENCIES, POPULAR_CURRENCIES, type CurrencyAbbr } from "../currency";
 import { fetchJsonData } from "../util";
 import { ErrorBoundary } from "react-error-boundary";
@@ -108,6 +101,7 @@ const InitCurrencyPicker: React.FC<CurrencyPickerProp> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const currencyPopover = useRef<HTMLDivElement | null>(null);
+  const currencySearchInput = useRef<HTMLInputElement | null>(null);
 
   function setCurrency(iso_code: CurrencyAbbr) {
     if (selectedCurrency === iso_code) return;
@@ -122,6 +116,10 @@ const InitCurrencyPicker: React.FC<CurrencyPickerProp> = ({
   const otherCurrencies: Currency[] = CURRENCIES.map((iso_code) => {
     return use(fetchJsonData(`/currency/${iso_code}`)) as Currency;
   });
+
+  const handlePopoverToggle = (e: React.ToggleEvent<HTMLDivElement>) => {
+    if (e.newState === "open") currencySearchInput.current?.focus();
+  };
 
   return (
     <>
@@ -141,6 +139,7 @@ const InitCurrencyPicker: React.FC<CurrencyPickerProp> = ({
 
       <div
         className="ssm:span-start span-all overflow-scroll bottom-0 w-full max-w-87 max-h-114.5 rounded-lg space-y-2.5 p-2 pbs-0 bg-neutral-600 border border-neutral-400 shadow-[0_1.25em_3.75_0_rgb(0_0_0/0.5)] starting:scale-0 transition-transform origin-top-right"
+        onToggle={handlePopoverToggle}
         popover="auto"
         id={id}
         style={{
@@ -151,11 +150,12 @@ const InitCurrencyPicker: React.FC<CurrencyPickerProp> = ({
       >
         <div className="sticky top-0 bg-inherit pbs-2">
           <input
-            className="w-full p-3 ps-9 rounded-[0.375em] border border-neutral-200 text-preset-5 text-neutral-200 bg-[url(/images/search.svg)] bg-position-[0.75em_50%] bg-size-[0.875rem] bg-no-repeat"
-            type="text"
+            className="w-full p-3 ps-9 rounded-[0.375em] border border-neutral-200 text-preset-5 text-neutral-200 bg-[url(/images/search.svg)] bg-position-[0.75em_50%] bg-size-[0.875rem] bg-no-repeat focus:outline-shadow-lime-500"
+            type="search"
             placeholder="Search currencies..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            ref={currencySearchInput}
           />
         </div>
 
