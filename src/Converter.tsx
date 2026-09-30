@@ -17,7 +17,7 @@ import {
 } from "./contexts/CurrencyContext";
 import Check from "./components/Check";
 
-type LogConversionLabelProp = Omit<Log, "loggedOn"> & {
+type LogConversionLabelProp = Omit<Omit<Log, "loggedOn">, "id"> & {
   isLogged: boolean;
   setIsLogged: utils.State<boolean>;
   baseInput: RefObject<HTMLInputElement | null>;
@@ -50,6 +50,7 @@ const LogConversionLabel: React.FC<LogConversionLabelProp> = ({
         quote,
         baseValue,
         quoteValue,
+        id: crypto.randomUUID(),
       },
     ]);
     setIsLogged(true);

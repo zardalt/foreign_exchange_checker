@@ -4,6 +4,7 @@ import { TABS } from "./util";
 import BoundedHistoryTab from "./tabs/HistoryTab";
 import CompareTabWrapped from "./tabs/CompareTab";
 import FavoritesTabWrapped from "./tabs/FavoritesTab";
+import LogTab from "./tabs/LogTab";
 
 const DetailsContainer: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<
@@ -20,7 +21,7 @@ const DetailsContainer: React.FC = () => {
       ) : currentTab === TABS.FAVORITES ? (
         <FavoritesTabWrapped />
       ) : (
-        <p>Not yet implemented</p>
+        <LogTab />
       )}
     </div>
   );

@@ -5,11 +5,18 @@ import {
   FavoritedCurrencyPairs,
   type CurrencyState,
 } from "../contexts/CurrencyContext";
-import { fetchJsonData, getColors, sliceNum, type State } from "../util";
+import {
+  animateContainerDeletion,
+  fetchJsonData,
+  getColors,
+  sliceNum,
+  type State,
+} from "../util";
 import dayjs from "dayjs";
 import { DATE_FORMAT } from "../Livemarkets";
 import StarSVG from "../components/StarSVG";
 import type { CurrencyAbbr } from "../currency";
+import RightArrow from "../components/RightArrow";
 
 const FavoriteHeaderLoading = () => {
   return (
@@ -48,18 +55,7 @@ const FavoritePairContainerLoading = () => {
         >
           <p className="flex items-center gap-x-2 grow">
             <span className="w-[3ch] h-4 bg-neutral-500 rounded-sm animate-pulse"></span>
-            <svg
-              width="11"
-              height="11"
-              viewBox="0 0 11 11"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M5.10938 0.0878906C5.20312 -0.0292969 5.39062 -0.0292969 5.50781 0.0878906L10.4062 4.98633C10.5234 5.10352 10.5234 5.26758 10.4062 5.38477L5.50781 10.2832C5.39062 10.4004 5.20312 10.4004 5.10938 10.2832L4.64062 9.83789C4.52344 9.7207 4.52344 9.5332 4.64062 9.43945L8.27344 5.7832H0.28125C0.117188 5.7832 0 5.66602 0 5.50195V4.8457C0 4.70508 0.117188 4.56445 0.28125 4.56445H8.27344L4.64062 0.931641C4.52344 0.837891 4.52344 0.650391 4.64062 0.533203L5.10938 0.0878906Z"
-                fill={getColors("neutral-200")}
-              />
-            </svg>
+            <RightArrow />
             <span className="w-[3ch] h-4 bg-neutral-500 rounded-sm animate-pulse"></span>
           </p>
           <p className="flex flex-col items-end gap-y-1.5">
@@ -129,36 +125,12 @@ const FavoritePairContainer: React.FC<FavoritePairContainerProp> = ({
     e.stopPropagation();
 
     const parentElement = e.currentTarget.parentElement as HTMLDivElement;
-    parentElement
-      .animate([{ opacity: 1 }, { opacity: 0 }], {
-        duration: 150,
-        easing: "ease-out",
-        fill: "forwards",
-      })
-      .finished.then(
-        () =>
-          parentElement.animate(
-            [
-              {
-                height: window
-                  .getComputedStyle(parentElement)
-                  .getPropertyValue("height"),
-              },
-              { height: 0 },
-            ],
-            {
-              duration: 150,
-              fill: "forwards",
-              easing: "ease-in-out",
-            },
-          ).finished,
-      )
-      .then(() => {
-        setFavorited(
-          (prev) =>
-            new Set([...prev].filter((pair) => pair !== `${base}/${quote}`)),
-        );
-      });
+    animateContainerDeletion(parentElement).then(() => {
+      setFavorited(
+        (prev) =>
+          new Set([...prev].filter((pair) => pair !== `${base}/${quote}`)),
+      );
+    });
   };
 
   const setCurrencies = (pair: Pair) => {
@@ -175,18 +147,7 @@ const FavoritePairContainer: React.FC<FavoritePairContainerProp> = ({
         >
           <p className="flex items-center gap-x-2 grow">
             <span className="text-preset-4">{pair.base}</span>
-            <svg
-              width="11"
-              height="11"
-              viewBox="0 0 11 11"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M5.10938 0.0878906C5.20312 -0.0292969 5.39062 -0.0292969 5.50781 0.0878906L10.4062 4.98633C10.5234 5.10352 10.5234 5.26758 10.4062 5.38477L5.50781 10.2832C5.39062 10.4004 5.20312 10.4004 5.10938 10.2832L4.64062 9.83789C4.52344 9.7207 4.52344 9.5332 4.64062 9.43945L8.27344 5.7832H0.28125C0.117188 5.7832 0 5.66602 0 5.50195V4.8457C0 4.70508 0.117188 4.56445 0.28125 4.56445H8.27344L4.64062 0.931641C4.52344 0.837891 4.52344 0.650391 4.64062 0.533203L5.10938 0.0878906Z"
-                fill={getColors("neutral-200")}
-              />
-            </svg>
+            <RightArrow />
             <span className="text-preset-4">{pair.quote}</span>
           </p>
           <div className="flex flex-col items-end gap-y-1.5">

@@ -146,3 +146,38 @@ export const getRandomCurrencies = (base: CurrencyAbbr) => {
 
   return currencies;
 };
+
+export const getTimeSince = (date: Date): string => {
+  const seconds = (Number(new Date()) - Number(date)) / 1000;
+
+  if (seconds < 60) return "< 1M";
+  else if (seconds < 3600) return `${Math.floor(seconds / 60)}M`;
+  else if (seconds < 86400) return `${Math.floor(seconds / 60 / 24)}H`;
+
+  return dayjs(date).format("DD MMM");
+};
+
+export const animateContainerDeletion = (elem: HTMLElement) => {
+  return elem
+    .animate([{ opacity: 1 }, { opacity: 0 }], {
+      duration: 150,
+      easing: "ease-out",
+      fill: "forwards",
+    })
+    .finished.then(
+      () =>
+        elem.animate(
+          [
+            {
+              height: window.getComputedStyle(elem).getPropertyValue("height"),
+            },
+            { height: 0 },
+          ],
+          {
+            duration: 150,
+            easing: "ease-out",
+            fill: "forwards",
+          },
+        ).finished,
+    );
+};

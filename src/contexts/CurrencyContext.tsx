@@ -14,6 +14,7 @@ export type Log = {
   quote: CurrencyAbbr;
   baseValue: string;
   quoteValue: string;
+  id: string;
 };
 
 export type TimePeriod = {
