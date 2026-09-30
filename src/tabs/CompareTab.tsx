@@ -16,6 +16,7 @@ import {
 import { ErrorBoundary } from "react-error-boundary";
 import type { Currency } from "../components/CurrencyPicker";
 import StarSVG from "../components/StarSVG";
+import EmptyDefault from "../components/EmptyDefault";
 
 type CompareHeaderProp = {
   currencyState: CurrencyState;
@@ -150,7 +151,7 @@ const CompareCurrencies: React.FC<
               <p className="text-preset-3 text-neutral-50">
                 {addCommas(
                   sliceNum(
-                    curr.rate * Number((sendValue || "1").split(",").join("")),
+                    curr.rate * Number(sendValue.split(",").join("")),
                     4,
                   ),
                 )}
@@ -190,6 +191,21 @@ const CompareTabLoading = () => {
   );
 };
 
+const NoSendValue = () => {
+  return (
+    <EmptyDefault
+      heading="No comparison available"
+      subHeading={
+        <>
+          Enter an amount in <span className="uppercase">send</span> above to
+          see what your money is worth in other currencies
+        </>
+      }
+      width={460}
+    />
+  );
+};
+
 const CompareTab: React.FC = () => {
   const { currencyState, setCurrencyState } = useContext(CurrencyStateContext);
   const { sendValue } = useContext(SendValueContext);
@@ -208,7 +224,7 @@ const CompareTab: React.FC = () => {
     })
     .filter((state) => state !== undefined);
 
-  return (
+  return sendValue ? (
     <div className="space-y-4 p-4 rounded-2xl bg-neutral-700 border border-neutral-600">
       <CompareHeader
         currencyState={currencyState}
@@ -222,6 +238,8 @@ const CompareTab: React.FC = () => {
         sendValue={sendValue}
       />
     </div>
+  ) : (
+    <NoSendValue />
   );
 };
 

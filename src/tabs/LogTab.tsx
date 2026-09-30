@@ -13,6 +13,7 @@ import {
   type State,
 } from "../util";
 import RightArrow from "../components/RightArrow";
+import EmptyDefault from "../components/EmptyDefault";
 
 type LogTabHeaderProp = {
   length: number;
@@ -113,14 +114,32 @@ const LogTabContainers: React.FC<LogTabContainersProp> = ({
   );
 };
 
+const NoLogs = () => {
+  return (
+    <EmptyDefault
+      heading="No conversions logged yet"
+      subHeading={
+        <>
+          Every conversion is recorded here automatically when you tap{" "}
+          <span className="uppercase">log conversion</span>. Your log is private
+          to this session and this browser
+        </>
+      }
+      width={740}
+    />
+  );
+};
+
 const LogTab: React.FC = () => {
   const { logs, setLogs } = useContext(ConversionLogsContext);
 
-  return (
+  return logs.length ? (
     <div className="space-y-5 px-4 py-5 rounded-2xl bg-neutral-700 border border-neutral-600">
       <LogTabHeader length={logs.length} setLogs={setLogs} />
       <LogTabContainers logs={logs} setLogs={setLogs} />
     </div>
+  ) : (
+    <NoLogs />
   );
 };
 

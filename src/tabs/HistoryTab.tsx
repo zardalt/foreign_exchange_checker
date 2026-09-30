@@ -8,6 +8,7 @@ import {
 } from "../contexts/CurrencyContext";
 import { getDatesFromRange, fetchJsonData } from "../util";
 import { ErrorBoundary } from "react-error-boundary";
+import EmptyDefault from "../components/EmptyDefault";
 
 function HistoryTabLoading() {
   return (
@@ -18,9 +19,12 @@ function HistoryTabLoading() {
   );
 }
 
-const HistoryTab: React.FC = () => {
+type HistoryTabProp = {
+  currencyState: CurrencyState;
+};
+
+const HistoryTab: React.FC<HistoryTabProp> = ({ currencyState }) => {
   const { timePeriod } = useContext(TimePeriodContext);
-  const { currencyState } = useContext(CurrencyStateContext);
 
   const dates = getDatesFromRange(timePeriod, 50);
   const rates = dates
@@ -46,11 +50,27 @@ const HistoryTab: React.FC = () => {
   );
 };
 
-const BoundedHistoryTab = () => {
+const HistoryTabError: React.FC<HistoryTabProp> = ({ currencyState }) => {
   return (
-    <ErrorBoundary fallback={<p>An error occured</p>}>
+    <EmptyDefault
+      heading="No chart data available"
+      subHeading={
+        "We couldn't load rate history for " +
+        `${currencyState.base}/${currencyState.quote}.` +
+        " This usually clears up in a minute"
+      }
+      width={508}
+    />
+  );
+};
+
+const BoundedHistoryTab = () => {
+  const { currencyState } = useContext(CurrencyStateContext);
+
+  return (
+    <ErrorBoundary fallback={<HistoryTabError currencyState={currencyState} />}>
       <Suspense fallback={<HistoryTabLoading />}>
-        <HistoryTab />
+        <HistoryTab currencyState={currencyState} />
       </Suspense>
     </ErrorBoundary>
   );

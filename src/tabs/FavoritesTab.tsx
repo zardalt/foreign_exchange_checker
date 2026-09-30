@@ -17,6 +17,7 @@ import { DATE_FORMAT } from "../Livemarkets";
 import StarSVG from "../components/StarSVG";
 import type { CurrencyAbbr } from "../currency";
 import RightArrow from "../components/RightArrow";
+import EmptyDefault from "../components/EmptyDefault";
 
 const FavoriteHeaderLoading = () => {
   return (
@@ -185,10 +186,20 @@ const FavoritesTabLoading = () => {
   );
 };
 
+const NoFavorites = () => {
+  return (
+    <EmptyDefault
+      heading="No pinned pairs yet"
+      subHeading="Pin a pair to track its rate here. Tap the star icon on any conversion or comparison row."
+      width={460}
+    />
+  );
+};
+
 const FavoritesTab: React.FC = () => {
   const { favorited, setFavorited } = useContext(FavoritedCurrencyPairs);
 
-  return (
+  return favorited.size ? (
     <div className="space-y-4 p-4 rounded-2xl bg-neutral-700 border border-neutral-600">
       <FavoriteHeader length={favorited.size} />
       <FavoritePairContainer
@@ -196,6 +207,8 @@ const FavoritesTab: React.FC = () => {
         setFavorited={setFavorited}
       />
     </div>
+  ) : (
+    <NoFavorites />
   );
 };
 
