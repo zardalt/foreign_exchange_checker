@@ -31,9 +31,10 @@ const CurrencyGroup: React.FC<CurrencyGroupProp> = ({
   setCurrency,
   searchTerm,
 }) => {
-  const searchRegex = new RegExp(searchTerm, "gi");
+  const trimmed = searchTerm.trim();
+  const searchRegex = new RegExp(trimmed, "gi");
 
-  const filteredCurrencies = searchTerm
+  const filteredCurrencies = trimmed
     ? currencies.filter(
         (currency) =>
           searchRegex.test(currency.name) ||

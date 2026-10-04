@@ -79,7 +79,7 @@ function App() {
   return (
     <CurrencyContext>
       <Header />
-      <div className="space-y-10 px-4 py-8">
+      <div className="max-w-275 lg:mx-auto space-y-10 lg:space-y-8 px-4 lg:px-8 sm:px-6 py-8 sm:py-12">
         <Converter />
         <DetailsContainer />
       </div>

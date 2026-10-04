@@ -206,9 +206,12 @@ const NoSendValue = () => {
   );
 };
 
-const CompareTab: React.FC = () => {
+type CompareTabProp = {
+  sendValue: string;
+};
+
+const CompareTab: React.FC<CompareTabProp> = ({ sendValue }) => {
   const { currencyState, setCurrencyState } = useContext(CurrencyStateContext);
-  const { sendValue } = useContext(SendValueContext);
 
   const randomCurrencies = getRandomCurrencies(currencyState.base);
 
@@ -224,7 +227,7 @@ const CompareTab: React.FC = () => {
     })
     .filter((state) => state !== undefined);
 
-  return sendValue ? (
+  return (
     <div className="space-y-4 p-4 rounded-2xl bg-neutral-700 border border-neutral-600">
       <CompareHeader
         currencyState={currencyState}
@@ -238,18 +241,20 @@ const CompareTab: React.FC = () => {
         sendValue={sendValue}
       />
     </div>
-  ) : (
-    <NoSendValue />
   );
 };
 
 const CompareTabWrapped = () => {
-  return (
+  const { sendValue } = useContext(SendValueContext);
+
+  return sendValue ? (
     <ErrorBoundary fallback={<p>An error occured</p>}>
       <Suspense fallback={<CompareTabLoading />}>
-        <CompareTab />
+        <CompareTab sendValue={sendValue} />
       </Suspense>
     </ErrorBoundary>
+  ) : (
+    <NoSendValue />
   );
 };
 

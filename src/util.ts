@@ -39,20 +39,23 @@ const TEN_MINUTES_AS_MS = 10 * 60 * 1000;
 
 const cache = new Map();
 
-function fetchAndAssignJsonData(url: string) {
+function fetchAndAssignJsonData(url: string, signal: AbortSignal | undefined) {
   cache.set(url, {
     wasSet: Number(new Date()),
-    promise: fetch(`${apiUrl}${url}`).then((res) => res.json()),
+    promise: fetch(`${apiUrl}${url}`, { signal }).then((res) => res.json()),
   });
 }
 
-export function fetchJsonData<T>(url: string): Promise<T> {
-  if (!cache.has(url)) fetchAndAssignJsonData(url);
+export function fetchJsonData<T>(
+  url: string,
+  signal?: AbortSignal,
+): Promise<T> {
+  if (!cache.has(url)) fetchAndAssignJsonData(url, signal);
 
   const value = cache.get(url);
 
   if (Number(new Date()) - value.wasSet > TEN_MINUTES_AS_MS) {
-    fetchAndAssignJsonData(url);
+    fetchAndAssignJsonData(url, signal);
     return cache.get(url).promise;
   }
 
@@ -77,8 +80,8 @@ export function getDatesFromRange(
   num?: number,
 ): string[] {
   if (!num) {
-    if (window.innerWidth < 400) num = 3;
-    else if (window.innerWidth < 800) num = 4;
+    if (window.innerWidth < 640) num = 3;
+    else if (window.innerWidth < 1000) num = 4;
     else num = 5;
   }
 
@@ -180,4 +183,8 @@ export const animateContainerDeletion = (elem: HTMLElement) => {
           },
         ).finished,
     );
+};
+
+export const getElementProperty = (el: HTMLElement, prop: string): number => {
+  return window.parseFloat(window.getComputedStyle(el).getPropertyValue(prop));
 };

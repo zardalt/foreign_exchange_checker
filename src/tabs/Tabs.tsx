@@ -1,5 +1,5 @@
 import React, { useContext, useRef, type RefObject } from "react";
-import { TABS, type State } from "../util";
+import { getColors, TABS, type State } from "../util";
 import {
   ConversionLogsContext,
   FavoritedCurrencyPairs,
@@ -41,6 +41,31 @@ const SelectItem: React.FC<SelectItemProp> = ({
   );
 };
 
+const TabButton: React.FC<
+  Omit<SelectItemProp, "menuPopover"> & { currentTab: TabValue }
+> = ({ text, tabValue, notificationCount, setCurrentTab, currentTab }) => {
+  return (
+    <button
+      className="flex items-center gap-2 px-4 h-10 text-neutral-50 border-b transition-colors"
+      onClick={() => {
+        setCurrentTab(tabValue);
+      }}
+      style={{
+        borderColor:
+          tabValue === currentTab ? getColors("lime-500") : "transparent",
+      }}
+    >
+      <span className="uppercase text-preset-3">{text}</span>
+      <span
+        className="size-5 rounded-full bg-lime-800 text-preset-6 text-lime-500 flex-center"
+        hidden={notificationCount === false}
+      >
+        {notificationCount}
+      </span>
+    </button>
+  );
+};
+
 type TabValue = (typeof TABS)[keyof typeof TABS];
 
 type TabsProp = {
@@ -56,7 +81,7 @@ const Tabs: React.FC<TabsProp> = ({ setCurrentTab, currentTab }) => {
   return (
     <>
       <div
-        className="px-3 rounded-lg bg-neutral-700 border border-neutral-400"
+        className="sm:hidden px-3 rounded-lg bg-neutral-700 border border-neutral-400"
         style={{
           anchorName: "--menuBtn",
         }}
@@ -89,7 +114,7 @@ const Tabs: React.FC<TabsProp> = ({ setCurrentTab, currentTab }) => {
         </button>
       </div>
       <div
-        className="text-neutral-50 w-[calc(100%_-_2em)] max-w-[unset] p-2 rounded-[0.625em] bg-neutral-700 border border-neutral-600 top-[calc(anchor(bottom)_+_.3em)] transition-transform starting:scale-y-0 origin-top"
+        className="sm:hidden text-neutral-50 w-[calc(100%_-_2em)] max-w-[unset] p-2 rounded-[0.625em] bg-neutral-700 border border-neutral-600 top-[calc(anchor(bottom)_+_.3em)] transition-transform starting:scale-y-0 origin-top"
         id="tabsMenu"
         popover="auto"
         style={{
@@ -125,6 +150,37 @@ const Tabs: React.FC<TabsProp> = ({ setCurrentTab, currentTab }) => {
           notificationCount={logs.length}
           setCurrentTab={setCurrentTab}
           menuPopover={menuPopover}
+        />
+      </div>
+      {/** Tablet and Desktop */}
+      <div className="hidden sm:flex gap-2 border-b border-b-neutral-600">
+        <TabButton
+          text={"History"}
+          tabValue={TABS.HISTORY}
+          notificationCount={false}
+          setCurrentTab={setCurrentTab}
+          currentTab={currentTab}
+        />
+        <TabButton
+          text={"Compare"}
+          tabValue={TABS.COMPARE}
+          notificationCount={false}
+          setCurrentTab={setCurrentTab}
+          currentTab={currentTab}
+        />
+        <TabButton
+          text={"Favorites"}
+          tabValue={TABS.FAVORITES}
+          notificationCount={favorited.size}
+          setCurrentTab={setCurrentTab}
+          currentTab={currentTab}
+        />
+        <TabButton
+          text={"Log"}
+          tabValue={TABS.LOG}
+          notificationCount={logs.length}
+          setCurrentTab={setCurrentTab}
+          currentTab={currentTab}
         />
       </div>
     </>

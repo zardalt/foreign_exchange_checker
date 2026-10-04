@@ -200,7 +200,7 @@ const FavoritesTab: React.FC = () => {
   const { favorited, setFavorited } = useContext(FavoritedCurrencyPairs);
 
   return favorited.size ? (
-    <div className="space-y-4 p-4 rounded-2xl bg-neutral-700 border border-neutral-600">
+    <div className="space-y-4 sm:space-y-5 p-4 sm:p-5 rounded-2xl bg-neutral-700 border border-neutral-600">
       <FavoriteHeader length={favorited.size} />
       <FavoritePairContainer
         favorited={favorited}
@@ -212,7 +212,7 @@ const FavoritesTab: React.FC = () => {
   );
 };
 
-const FavoritesTabWrapped = () => {
+const BoundedFavoritesTab = () => {
   return (
     <ErrorBoundary fallback={<p>An error occured</p>}>
       <Suspense fallback={<FavoritesTabLoading />}>
@@ -222,4 +222,4 @@ const FavoritesTabWrapped = () => {
   );
 };
 
-export default FavoritesTabWrapped;
+export default BoundedFavoritesTab;

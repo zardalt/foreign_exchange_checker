@@ -144,6 +144,8 @@ const Converter: React.FC = () => {
   const [isLogged, setIsLogged] = useState(false);
 
   const sendInput = useRef<HTMLInputElement | null>(null);
+  const converterForm = useRef<HTMLFormElement | null>(null);
+  const exchangeButton = useRef<HTMLButtonElement | null>(null);
 
   const { sendValue, setSendValue } = useContext(SendValueContext);
   const { currencyState, setCurrencyState } = useContext(CurrencyStateContext);
@@ -163,7 +165,7 @@ const Converter: React.FC = () => {
     setIsLogged(false);
   }
 
-  useEffect(submitForm, [sendValue]);
+  useEffect(submitForm, [sendValue, currencyState.base, currencyState.quote]);
 
   function handleFromCurrencyInputChange(
     e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
@@ -185,7 +187,6 @@ const Converter: React.FC = () => {
         rate: prev.rate,
       };
     });
-    setRecieveValue("0");
   }
 
   return (
@@ -193,12 +194,15 @@ const Converter: React.FC = () => {
       <h2 className="uppercase text-preset-2">Check the Rate</h2>
 
       <div className="bg-neutral-700 shadow-[0_12px_40px_0_rgb(0_0_0/0.4)] rounded-[1.25em]">
-        <form className="p-4 space-y-4">
-          <div className="space-y-5 p-4 rounded-2xl container-preset-1">
+        <form
+          className="flex flex-col sm:flex-row items-center p-4 sm:p-5 gap-4 sm:gap-6"
+          ref={converterForm}
+        >
+          <div className="w-full space-y-5 p-4 sm:p-5 rounded-2xl container-preset-1">
             <h3 className="uppercase text-preset-4 text-neutral-100">Send</h3>
             <div className="flex flex-wrap gap-y-2 justify-between items-center">
               <input
-                className="text-preset-1 placeholder:text-neutral-200 border-b border-b-transparent hover:border-b-neutral-200 focus-visible:outline-none focus-visible:rounded-lg focus:outline-shadow-lime-500 max-w-[60%]"
+                className="text-preset-1 sm:text-[2rem] placeholder:text-neutral-200 border-b border-b-transparent hover:border-b-neutral-200 focus-visible:outline-none focus-visible:rounded-lg focus:outline-shadow-lime-500 field-sizing-content max-w-[50%]"
                 type="text"
                 inputMode="numeric"
                 placeholder="0"
@@ -217,18 +221,19 @@ const Converter: React.FC = () => {
             </div>
           </div>
           <button
-            className="size-12 disabled:opacity-75 disabled:cursor-not-allowed rounded-lg bg-neutral-600 border border-neutral-500 bg-no-repeat bg-center bg-[url(/images/vertical_exchange.svg)] bg-size-[1.25em] mx-auto block hover:not-disabled:bg-neutral-400 transition-colors focus-visible:outline-shadow-lime-500"
+            className="size-12 shrink-0 disabled:opacity-75 disabled:cursor-not-allowed rounded-lg bg-neutral-600 border border-neutral-500 bg-no-repeat bg-center bg-[url(/images/vertical_exchange.svg)] bg-size-[1.25em] block hover:not-disabled:bg-neutral-400 transition-colors focus-visible:outline-shadow-lime-500"
             type="button"
             aria-label="Swap currencies"
             disabled={isFetching}
             onClick={swapCurrencies}
+            ref={exchangeButton}
           ></button>
-          <div className="space-y-5 p-4 rounded-2xl container-preset-1">
+          <div className="w-full space-y-5 p-4 sm:p-5 rounded-2xl container-preset-1">
             <h3 className="text-preset-4 uppercase text-neutral-100">
               Recieve
             </h3>
             <div className="flex items-center justify-between flex-wrap gap-y-2">
-              <output className="text-preset-1 text-lime-500 w-fit max-w-full overflow-x-auto">
+              <output className="text-preset-1 text-lime-500 w-fit max-w-[50%] overflow-x-auto">
                 {recieveValue}
               </output>
               <CurrencyPicker
@@ -242,8 +247,8 @@ const Converter: React.FC = () => {
             </div>
           </div>
         </form>
-        <div className="flex flex-col items-center gap-4 p-4 border-bs border-bs-neutral-500 border-dashed">
-          <p className="flex items-center text-preset-6 text-neutral-50">
+        <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-4 p-4 sm:px-5 border-bs border-bs-neutral-500 border-dashed">
+          <p className="flex items-center text-preset-6 sm:text-preset-5 text-neutral-50">
             {isFetching ? (
               <>
                 <span>1 {currencyState.base} = </span>

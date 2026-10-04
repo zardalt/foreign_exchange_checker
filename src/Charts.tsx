@@ -6,7 +6,7 @@ import {
 import { getColors, getDatesFromRange } from "./util";
 import { Chart, registerables } from "chart.js";
 import dayjs from "dayjs";
-import { sliceNum } from "./util";
+import { sliceNum, getElementProperty } from "./util";
 
 Chart.register(...registerables);
 Chart.defaults.font = {
@@ -35,6 +35,7 @@ const GraphContainer: React.FC<GraphProp> = ({
 }) => {
   const { timePeriod } = useContext(TimePeriodContext);
   const graphCanvas = useRef<HTMLCanvasElement | null>(null);
+  const prevWidth = useRef(0);
   const maxRate = Math.max(...rates),
     minRate = Math.min(...rates);
 
@@ -104,8 +105,34 @@ const GraphContainer: React.FC<GraphProp> = ({
       },
     });
 
+    const cntrl = new AbortController();
+    const parent = graphCanvas.current.parentElement!.parentElement!;
+    const sibling = graphCanvas.current.parentElement!.previousElementSibling!;
+    const getWidth = (el: Element) =>
+      getElementProperty(el as HTMLElement, "width");
+
+    prevWidth.current = getWidth(graphCanvas.current);
+
+    window.addEventListener(
+      "resize",
+      () => {
+        const width =
+          getWidth(parent) -
+          getWidth(sibling) -
+          getElementProperty(parent, "column-gap");
+        if (width >= prevWidth.current) {
+          prevWidth.current = width;
+          return;
+        }
+        chart.resize(width, 272);
+        prevWidth.current = width;
+      },
+      { signal: cntrl.signal },
+    );
+
     return () => {
       chart.destroy();
+      cntrl.abort();
     };
   }, [dates]);
 
@@ -194,7 +221,7 @@ const ChartContainer: React.FC<ChartContainerProp> = ({
   const date = dayjs();
 
   return (
-    <div className="space-y-5 px-3 py-4 rounded-2xl bg-neutral-700 border border-neutral-600">
+    <div className="space-y-5 px-3 py-4 sm:p-5 rounded-2xl bg-neutral-700 border border-neutral-600">
       <div className="flex justify-between items-center">
         <p className="text-preset-3 font-medium">
           {currencyState.base}/{currencyState.quote}

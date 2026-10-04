@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Tabs from "./tabs/Tabs";
 import { TABS } from "./util";
 import BoundedHistoryTab from "./tabs/HistoryTab";
-import CompareTabWrapped from "./tabs/CompareTab";
-import FavoritesTabWrapped from "./tabs/FavoritesTab";
+import BoundedCompareTab from "./tabs/CompareTab";
+import BoundedFavoritesTab from "./tabs/FavoritesTab";
 import LogTab from "./tabs/LogTab";
 
 const DetailsContainer: React.FC = () => {
@@ -17,9 +17,9 @@ const DetailsContainer: React.FC = () => {
       {currentTab === TABS.HISTORY ? (
         <BoundedHistoryTab />
       ) : currentTab === TABS.COMPARE ? (
-        <CompareTabWrapped />
+        <BoundedCompareTab />
       ) : currentTab === TABS.FAVORITES ? (
-        <FavoritesTabWrapped />
+        <BoundedFavoritesTab />
       ) : (
         <LogTab />
       )}
