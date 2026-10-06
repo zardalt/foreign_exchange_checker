@@ -42,7 +42,9 @@ export const CurrencyStateContext = createContext<{
   currencyState: initialValue,
   setCurrencyState: () => initialValue,
 });
+
 export const FetchingContext = createContext(false);
+
 export const FavoritedCurrencyPairs = createContext<{
   favorited: Set<string>;
   setFavorited: React.Dispatch<React.SetStateAction<Set<string>>>;
@@ -50,6 +52,7 @@ export const FavoritedCurrencyPairs = createContext<{
   favorited: set,
   setFavorited: () => set,
 });
+
 export const ConversionLogsContext = createContext<{
   logs: Log[];
   setLogs: State<Log[]>;
@@ -57,6 +60,7 @@ export const ConversionLogsContext = createContext<{
   logs: [],
   setLogs: () => {},
 });
+
 export const TimePeriodContext = createContext<{
   timePeriod: TimePeriod;
   setTimePeriod: State<TimePeriod>;
@@ -64,6 +68,7 @@ export const TimePeriodContext = createContext<{
   timePeriod: timePeriodInitialPeriod,
   setTimePeriod: () => timePeriodInitialPeriod,
 });
+
 export const SendValueContext = createContext<{
   sendValue: string;
   setSendValue: State<string>;

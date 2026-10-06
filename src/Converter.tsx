@@ -97,10 +97,13 @@ const FavoriteLabel: React.FC<FavoriteLabelProp> = ({ base, quote }) => {
   const isFavorited = favoritedContext.favorited.has(currPair);
 
   function handleInputChange() {
-    favoritedContext.setFavorited((prev) =>
-      isFavorited
-        ? new Set([...prev].filter((pair) => pair !== currPair))
-        : new Set([...prev, currPair]),
+    favoritedContext.setFavorited(
+      (prev) =>
+        new Set(
+          isFavorited
+            ? [...prev].filter((pair) => pair !== currPair)
+            : [...prev, currPair],
+        ),
     );
   }
 
@@ -203,6 +206,7 @@ const Converter: React.FC = () => {
             <div className="flex flex-wrap gap-y-2 justify-between items-center">
               <input
                 className="text-preset-1 sm:text-[2rem] placeholder:text-neutral-200 border-b border-b-transparent hover:border-b-neutral-200 focus-visible:outline-none focus-visible:rounded-lg focus:outline-shadow-lime-500 field-sizing-content max-w-[50%]"
+                id="sendInput"
                 type="text"
                 inputMode="numeric"
                 placeholder="0"

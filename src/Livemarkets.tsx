@@ -2,8 +2,8 @@ import dayjs from "dayjs";
 import { useEffect, useRef, type FC, Suspense, use } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { fetchJsonData, sliceNum } from "./util";
-import "./Livemarkets.css";
 import { CURRENCIES, POPULAR_CURRENCIES } from "./currency";
+import "./Livemarkets.css";
 
 type ExchangeRate = {
   currencyPair: string;
@@ -11,6 +11,7 @@ type ExchangeRate = {
   change: string;
 };
 
+const LIVEMARKETS_GROUP = "lm";
 export const DATE_FORMAT = "YYYY-MM-DD";
 
 function LoadingLiveMarkets() {
@@ -29,6 +30,16 @@ function LoadingLiveMarkets() {
   );
 }
 
+const LiveMarketsError = () => {
+  return (
+    <div className="flex-center px-4 w-full gap-x-6 bg-neutral-600">
+      <p className="text-center uppercase text-preset-6">
+        An error occured when getting the current rates. Please refresh the page
+      </p>
+    </div>
+  );
+};
+
 const Livemarkets: FC = () => {
   return (
     <div className="flex overflow-hidden">
@@ -39,8 +50,8 @@ const Livemarkets: FC = () => {
         ></span>
         Live Markets
       </div>
-      <div className="flex">
-        <ErrorBoundary fallback={<p>An error occured</p>}>
+      <div className="flex w-full">
+        <ErrorBoundary fallback={<LiveMarketsError />}>
           <Suspense fallback={<LoadingLiveMarkets />}>
             <RatesContainer />
             <RatesContainer />
@@ -82,7 +93,7 @@ const randomCurrencyPairs = (() => {
   return randomizedPairs;
 })();
 
-const RatesContainer: FC = () => {
+const RatesContainer = () => {
   const rateContainer = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -118,9 +129,14 @@ const RatesContainer: FC = () => {
 
   const rates: (ExchangeRate & { id: number })[] = randomCurrencyPairs
     .map((pair, index) => {
-      const currentRate = use(fetchJsonData<LiveRates>(`/rate/${pair}`));
+      const currentRate = use(
+        fetchJsonData<LiveRates>(`/rate/${pair}`, LIVEMARKETS_GROUP),
+      );
       const prevRate = use(
-        fetchJsonData<LiveRates>(`/rate/${pair}?from=${oneMonthAgo}`),
+        fetchJsonData<LiveRates>(
+          `/rate/${pair}?from=${oneMonthAgo}`,
+          LIVEMARKETS_GROUP,
+        ),
       );
 
       if (currentRate.rate === undefined || prevRate.rate === undefined)

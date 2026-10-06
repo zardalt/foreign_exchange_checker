@@ -9,7 +9,6 @@ import {
   animateContainerDeletion,
   getTimeSince,
   sliceNum,
-  fetchJsonData,
   type State,
 } from "../util";
 import RightArrow from "../components/RightArrow";
@@ -54,10 +53,14 @@ const LogTabContainers: React.FC<LogTabContainersProp> = ({
 }) => {
   const { currencyState, setCurrencyState } = useContext(CurrencyStateContext);
   const { setSendValue } = useContext(SendValueContext);
+  const sendInput = useRef(document.getElementById("sendInput"));
 
   const rerunConversion = (log: Log) => {
-    if (currencyState.base === log.base && currencyState.quote === log.quote)
+    if (currencyState.base === log.base && currencyState.quote === log.quote) {
+      setSendValue(log.baseValue);
+      sendInput.current?.scrollIntoView();
       return;
+    }
 
     setCurrencyState({
       base: log.base,
@@ -66,6 +69,7 @@ const LogTabContainers: React.FC<LogTabContainersProp> = ({
     });
 
     setSendValue(log.baseValue);
+    sendInput.current?.scrollIntoView();
   };
 
   const deleteLog = (

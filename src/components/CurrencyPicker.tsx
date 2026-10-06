@@ -181,6 +181,14 @@ const InitCurrencyPicker: React.FC<CurrencyPickerProp> = ({
   );
 };
 
+const CurrencyPickerError = () => {
+  return (
+    <p className="text-preset-6 uppercase text-center">
+      Could not load currencies
+    </p>
+  );
+};
+
 const CurrencyPicker: React.FC<CurrencyPickerProp> = ({
   anchorName,
   id,
@@ -190,7 +198,7 @@ const CurrencyPicker: React.FC<CurrencyPickerProp> = ({
   const isFetching = useContext(FetchingContext);
 
   return (
-    <ErrorBoundary fallback={<p>An error occured</p>}>
+    <ErrorBoundary fallback={<CurrencyPickerError />}>
       <Suspense fallback={<LoadingButton />}>
         {isFetching ? (
           <LoadingButton />

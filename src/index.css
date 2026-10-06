@@ -35,6 +35,12 @@
 }
 
 @layer base {
+  /* *, */
+  /* *::before, */
+  /* *::after { */
+  /*   outline: 1px solid red; */
+  /* } */
+
   body {
     background-color: black;
     color: white;

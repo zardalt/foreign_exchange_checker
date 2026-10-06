@@ -8,11 +8,11 @@ import {
   TimePeriodContext,
   timePeriodInitialPeriod,
   type Log,
-} from "./contexts/CurrencyContext";
+} from "./contexts/CurrencyContext.ts";
 import type { CurrencyState, TimePeriod } from "./contexts/CurrencyContext";
 import Header from "./Header";
 import Converter from "./Converter";
-import { fetchJsonData } from "./util";
+import { fetchJsonData, getLSItem, setLSItem } from "./util";
 import DetailsContainer from "./DetailsContainer";
 
 type Prop = {
@@ -23,15 +23,26 @@ const CurrencyContext: React.FC<Prop> = ({ children }) => {
   const [currencyState, setCurrencyState] = useState<CurrencyState>({
     base: "USD",
     quote: "EUR",
-    rate: 0.853,
+    rate: 0.853, // rate will be fetched and updated. This is just a default
   });
   const [sendValue, setSendValue] = useState<string>("");
   const [isFetching, setIsFetching] = useState(false);
-  const [favorited, setFavorited] = useState(new Set<string>());
-  const [loggedConversions, setLoggedConversions] = useState<Log[]>([]);
+  const [favorited, setFavorited] = useState(
+    new Set<string>(getLSItem("favorites", [])),
+  );
+  const [loggedConversions, setLoggedConversions] = useState<Log[]>(
+    getLSItem("loggedConversions", []),
+  );
   const [timePeriod, setTimePeriod] = useState<TimePeriod>(
     timePeriodInitialPeriod,
   );
+
+  useEffect(() => {
+    setLSItem("favorites", [...favorited]);
+  }, [favorited]);
+  useEffect(() => {
+    setLSItem("loggedConversions", loggedConversions);
+  }, [loggedConversions]);
 
   useEffect(() => {
     async function getCurrentRate() {

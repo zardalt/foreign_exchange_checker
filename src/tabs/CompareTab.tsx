@@ -1,4 +1,4 @@
-import React, { Suspense, use, useContext } from "react";
+import React, { Suspense, use, useContext, useRef } from "react";
 import {
   CurrencyStateContext,
   FavoritedCurrencyPairs,
@@ -103,6 +103,7 @@ const CompareCurrencies: React.FC<
   CompareHeaderProp & { setCurrencyState: State<CurrencyState> }
 > = ({ currencies, sendValue, setCurrencyState }) => {
   const { favorited, setFavorited } = useContext(FavoritedCurrencyPairs);
+  const sendInput = useRef(document.getElementById("sendInput"));
 
   const currenciesWithName = currencies.map((curr) => {
     return {
@@ -121,6 +122,7 @@ const CompareCurrencies: React.FC<
 
   const setCurrencies = (curr: CurrencyState) => {
     setCurrencyState(curr);
+    sendInput.current?.scrollIntoView();
   };
 
   return (
@@ -206,6 +208,16 @@ const NoSendValue = () => {
   );
 };
 
+const CompareTabError = () => {
+  return (
+    <EmptyDefault
+      heading="Cannot load currencies to compare"
+      subHeading="An error occured when trying to load compare currencies. Please check your connection then refresh the page"
+      width={580}
+    />
+  );
+};
+
 type CompareTabProp = {
   sendValue: string;
 };
@@ -248,7 +260,7 @@ const CompareTabWrapped = () => {
   const { sendValue } = useContext(SendValueContext);
 
   return sendValue ? (
-    <ErrorBoundary fallback={<p>An error occured</p>}>
+    <ErrorBoundary fallback={<CompareTabError />}>
       <Suspense fallback={<CompareTabLoading />}>
         <CompareTab sendValue={sendValue} />
       </Suspense>

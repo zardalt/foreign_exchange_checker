@@ -1,4 +1,4 @@
-import React, { Suspense, use, useContext } from "react";
+import React, { Suspense, use, useContext, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import {
   CurrencyStateContext,
@@ -91,6 +91,7 @@ const FavoritePairContainer: React.FC<FavoritePairContainerProp> = ({
   setFavorited,
 }) => {
   const { setCurrencyState } = useContext(CurrencyStateContext);
+  const sendInput = useRef(document.getElementById("sendInput"));
 
   const favoritePairs: Pair[] = [...favorited]
     .map((pair) => {
@@ -136,6 +137,7 @@ const FavoritePairContainer: React.FC<FavoritePairContainerProp> = ({
 
   const setCurrencies = (pair: Pair) => {
     setCurrencyState(pair);
+    sendInput.current?.scrollIntoView();
   };
 
   return (
@@ -196,6 +198,16 @@ const NoFavorites = () => {
   );
 };
 
+const FavoritesError = () => {
+  return (
+    <EmptyDefault
+      heading="Cannot load favorites"
+      subHeading="An error occured when trying to load favorites. Please check your connection then refresh the page"
+      width={490}
+    />
+  );
+};
+
 const FavoritesTab: React.FC = () => {
   const { favorited, setFavorited } = useContext(FavoritedCurrencyPairs);
 
@@ -214,7 +226,7 @@ const FavoritesTab: React.FC = () => {
 
 const BoundedFavoritesTab = () => {
   return (
-    <ErrorBoundary fallback={<p>An error occured</p>}>
+    <ErrorBoundary fallback={<FavoritesError />}>
       <Suspense fallback={<FavoritesTabLoading />}>
         <FavoritesTab />
       </Suspense>

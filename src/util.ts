@@ -1,5 +1,8 @@
 import dayjs from "dayjs";
-import { type TimePeriod } from "./contexts/CurrencyContext";
+import {
+  type CurrencyState,
+  type TimePeriod,
+} from "./contexts/CurrencyContext";
 import { DATE_FORMAT } from "./Livemarkets";
 import { CURRENCIES, POPULAR_CURRENCIES, type CurrencyAbbr } from "./currency";
 
@@ -37,29 +40,48 @@ export function addCommas(n: string): string {
 
 const TEN_MINUTES_AS_MS = 10 * 60 * 1000;
 
-const cache = new Map();
+type JSONData<T> = {
+  wasSet: number;
+  promise: Promise<T>;
+  group: string;
+};
+const cache = new Map<string, JSONData<unknown>>();
 
-function fetchAndAssignJsonData(url: string, signal: AbortSignal | undefined) {
+function fetchAndAssignJsonData(
+  url: string,
+  signal: AbortSignal | undefined,
+  group: string,
+) {
   cache.set(url, {
     wasSet: Number(new Date()),
     promise: fetch(`${apiUrl}${url}`, { signal }).then((res) => res.json()),
+    group: group,
   });
 }
 
 export function fetchJsonData<T>(
   url: string,
+  group = "none",
   signal?: AbortSignal,
 ): Promise<T> {
-  if (!cache.has(url)) fetchAndAssignJsonData(url, signal);
+  if (!cache.has(url)) fetchAndAssignJsonData(url, signal, group);
 
-  const value = cache.get(url);
+  const value = cache.get(url)!;
 
   if (Number(new Date()) - value.wasSet > TEN_MINUTES_AS_MS) {
-    fetchAndAssignJsonData(url, signal);
-    return cache.get(url).promise;
+    fetchAndAssignJsonData(url, signal, group);
+    return (cache.get(url) as JSONData<T>).promise;
   }
 
-  return value.promise;
+  return (value as JSONData<T>).promise;
+}
+
+export function refetch(group: string) {
+  for (const [url, data] of cache) {
+    if (data.group === group) {
+      fetchAndAssignJsonData(url, undefined, group);
+    }
+  }
 }
 
 export function sliceNum(n: number, stopAt: number = 2): string {
@@ -187,4 +209,28 @@ export const animateContainerDeletion = (elem: HTMLElement) => {
 
 export const getElementProperty = (el: HTMLElement, prop: string): number => {
   return window.parseFloat(window.getComputedStyle(el).getPropertyValue(prop));
+};
+
+const STORAGE_KEYS = Object.freeze({
+  favorites: "fec_fav",
+  loggedConversions: "fec_lg_cnv",
+});
+
+export const getLSItem = <T>(
+  key: keyof typeof STORAGE_KEYS,
+  defaultValue: T,
+): T => {
+  const ls = localStorage.getItem(STORAGE_KEYS[key]);
+
+  if (!ls) return defaultValue;
+
+  try {
+    return JSON.parse(ls);
+  } catch {
+    return defaultValue;
+  }
+};
+
+export const setLSItem = <T>(key: keyof typeof STORAGE_KEYS, value: T) => {
+  localStorage.setItem(STORAGE_KEYS[key], JSON.stringify(value));
 };
