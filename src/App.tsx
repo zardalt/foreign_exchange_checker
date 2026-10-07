@@ -73,16 +73,20 @@ const CurrencyContext: React.FC<Prop> = ({ children }) => {
           return { rate: undefined };
         });
 
+      const currentUrl = new URL(location.href);
+
       if (currentRate.rate !== undefined) {
         setCurrencyState({ ...currentRate });
 
-        const currentUrl = new URL(location.href);
         currentUrl.searchParams.set("base", currentRate.base);
         currentUrl.searchParams.set("quote", currentRate.quote);
+      } else {
+        setShowCurrencyError(true);
+        currentUrl.searchParams.set("base", currencyState.base);
+        currentUrl.searchParams.set("quote", currencyState.quote);
+      }
 
-        window.history.replaceState({}, "", currentUrl);
-      } else setShowCurrencyError(true);
-
+      window.history.replaceState({}, "", currentUrl);
       setIsFetching(false);
     })();
   }
@@ -96,9 +100,11 @@ const CurrencyContext: React.FC<Prop> = ({ children }) => {
       attemptSettingCurrencyState({
         base,
         quote,
-        rate: 1, // will be updated
+        rate: 1, // will be fetched and updated
       });
-    } else attemptSettingCurrencyState(currencyState);
+    } else {
+      attemptSettingCurrencyState(currencyState);
+    }
   }, []);
 
   return (
