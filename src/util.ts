@@ -1,8 +1,5 @@
 import dayjs from "dayjs";
-import {
-  type CurrencyState,
-  type TimePeriod,
-} from "./contexts/CurrencyContext";
+import { type TimePeriod } from "./contexts/CurrencyContext";
 import { DATE_FORMAT } from "./Livemarkets";
 import { CURRENCIES, POPULAR_CURRENCIES, type CurrencyAbbr } from "./currency";
 

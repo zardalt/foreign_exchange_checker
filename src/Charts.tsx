@@ -227,7 +227,8 @@ const ChartContainer: React.FC<ChartContainerProp> = ({
           {currencyState.base}/{currencyState.quote}
         </p>
         <p className="text-preset-5 opacity-70">
-          {sliceNum(currencyState.rate)} &middot; {date.format("MMM DD HH:mm")}{" "}
+          {sliceNum(currencyState.rate, 4)} &middot;{" "}
+          {date.format("MMM DD HH:mm")}{" "}
           {date.toString().substring(date.toString().length - 3)}
         </p>
       </div>

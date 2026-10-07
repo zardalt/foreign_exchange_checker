@@ -201,7 +201,7 @@ const Converter: React.FC = () => {
           className="flex flex-col sm:flex-row items-center p-4 sm:p-5 gap-4 sm:gap-6"
           ref={converterForm}
         >
-          <div className="w-full space-y-5 p-4 sm:p-5 rounded-2xl container-preset-1">
+          <div className="w-full space-y-5 p-4 sm:p-5 rounded-2xl container-preset-1 overflow-x-hidden">
             <h3 className="uppercase text-preset-4 text-neutral-100">Send</h3>
             <div className="flex flex-wrap gap-y-2 justify-between items-center">
               <input
@@ -261,7 +261,7 @@ const Converter: React.FC = () => {
               </>
             ) : (
               <>
-                1 {currencyState.base} = {utils.sliceNum(currencyState.rate)}{" "}
+                1 {currencyState.base} = {utils.sliceNum(currencyState.rate, 4)}{" "}
                 {currencyState.quote}
               </>
             )}

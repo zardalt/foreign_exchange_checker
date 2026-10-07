@@ -14,22 +14,30 @@ import Header from "./Header";
 import Converter from "./Converter";
 import { fetchJsonData, getLSItem, setLSItem } from "./util";
 import DetailsContainer from "./DetailsContainer";
+import type { CurrencyAbbr } from "./currency.ts";
 
 type Prop = {
   children: React.ReactNode;
 };
 
 const CurrencyContext: React.FC<Prop> = ({ children }) => {
-  const [currencyState, setCurrencyState] = useState<CurrencyState>({
-    base: "USD",
-    quote: "EUR",
-    rate: 0.853, // rate will be fetched and updated. This is just a default
-  });
   const [sendValue, setSendValue] = useState<string>("");
   const [isFetching, setIsFetching] = useState(false);
   const [favorited, setFavorited] = useState(
     new Set<string>(getLSItem("favorites", [])),
   );
+  const [currencyState, setCurrencyState] = useState<CurrencyState>(() => {
+    const [base, quote] = ([...favorited].at(-1) || "USD/EUR").split("/") as [
+      CurrencyAbbr,
+      CurrencyAbbr,
+    ];
+
+    return {
+      base,
+      quote,
+      rate: 0.853, // rate will be fetched and updated. This is just a default
+    };
+  });
   const [loggedConversions, setLoggedConversions] = useState<Log[]>(
     getLSItem("loggedConversions", []),
   );
@@ -44,23 +52,57 @@ const CurrencyContext: React.FC<Prop> = ({ children }) => {
     setLSItem("loggedConversions", loggedConversions);
   }, [loggedConversions]);
 
-  useEffect(() => {
-    async function getCurrentRate() {
+  function attemptSettingCurrencyState(
+    newCurrencyState: ((prev: CurrencyState) => CurrencyState) | CurrencyState,
+  ) {
+    (async () => {
       setIsFetching(true);
 
+      newCurrencyState =
+        typeof newCurrencyState === "function"
+          ? newCurrencyState.apply(null, [currencyState])
+          : newCurrencyState;
+
       const currentRate = await fetchJsonData<CurrencyState>(
-        `/rate/${currencyState.base}/${currencyState.quote}`,
-      );
-      setCurrencyState({ ...currentRate });
+        `/rate/${newCurrencyState.base}/${newCurrencyState.quote}`,
+      )
+        .then()
+        .catch(() => {
+          return { rate: undefined };
+        });
+
+      if (currentRate.rate !== undefined) {
+        setCurrencyState({ ...currentRate });
+
+        const currentUrl = new URL(location.href);
+        currentUrl.searchParams.set("base", currentRate.base);
+        currentUrl.searchParams.set("quote", currentRate.quote);
+
+        window.history.replaceState({}, "", currentUrl);
+      }
 
       setIsFetching(false);
-    }
+    })();
+  }
 
-    getCurrentRate();
-  }, [currencyState.base, currencyState.quote]);
+  useEffect(() => {
+    const url = new URL(location.href);
+    const base = url.searchParams.get("base") as CurrencyAbbr | null,
+      quote = url.searchParams.get("quote") as CurrencyAbbr | null;
+
+    if (base !== null && quote !== null) {
+      attemptSettingCurrencyState({
+        base,
+        quote,
+        rate: 1, // will be updated
+      });
+    } else attemptSettingCurrencyState(currencyState);
+  }, []);
 
   return (
-    <CurrencyStateContext value={{ currencyState, setCurrencyState }}>
+    <CurrencyStateContext
+      value={{ currencyState, setCurrencyState: attemptSettingCurrencyState }}
+    >
       <FetchingContext value={isFetching}>
         <FavoritedCurrencyPairs value={{ favorited, setFavorited }}>
           <ConversionLogsContext

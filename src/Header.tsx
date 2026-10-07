@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Activity } from "react";
 import Logo from "./assets/logo.svg";
 import Livemarkets from "./Livemarkets";
 import { CURRENCIES, POPULAR_CURRENCIES } from "./currency";
@@ -15,7 +15,9 @@ const Header: React.FC = () => {
           Data
         </p>
       </header>
-      <Livemarkets />
+      <Activity>
+        <Livemarkets />
+      </Activity>
     </div>
   );
 };
