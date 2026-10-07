@@ -15,6 +15,7 @@ import Converter from "./Converter";
 import { fetchJsonData, getLSItem, setLSItem } from "./util";
 import DetailsContainer from "./DetailsContainer";
 import type { CurrencyAbbr } from "./currency.ts";
+import InvalidCurrencyError from "./InvalidCurrencyError.tsx";
 
 type Prop = {
   children: React.ReactNode;
@@ -44,6 +45,7 @@ const CurrencyContext: React.FC<Prop> = ({ children }) => {
   const [timePeriod, setTimePeriod] = useState<TimePeriod>(
     timePeriodInitialPeriod,
   );
+  const [showCurrencyError, setShowCurrencyError] = useState(false);
 
   useEffect(() => {
     setLSItem("favorites", [...favorited]);
@@ -79,7 +81,7 @@ const CurrencyContext: React.FC<Prop> = ({ children }) => {
         currentUrl.searchParams.set("quote", currentRate.quote);
 
         window.history.replaceState({}, "", currentUrl);
-      }
+      } else setShowCurrencyError(true);
 
       setIsFetching(false);
     })();
@@ -118,6 +120,10 @@ const CurrencyContext: React.FC<Prop> = ({ children }) => {
               }}
             >
               <SendValueContext value={{ sendValue, setSendValue }}>
+                <InvalidCurrencyError
+                  setShowError={setShowCurrencyError}
+                  showError={showCurrencyError}
+                />
                 {children}
               </SendValueContext>
             </TimePeriodContext>
