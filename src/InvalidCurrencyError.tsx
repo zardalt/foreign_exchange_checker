@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import type { CurrencyState } from "./contexts/CurrencyContext";
 import type { State } from "./util";
 
 interface InvalidCurrencyProp {
