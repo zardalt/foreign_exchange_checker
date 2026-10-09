@@ -132,7 +132,7 @@ const InitCurrencyPicker: React.FC<CurrencyPickerProp> = ({
       >
         <img
           className="w-5 rounded-full"
-          src={`/flags/${selectedCurrency.substring(0, 2).toLowerCase()}.webp`}
+          src={`${import.meta.env.BASE_URL}flags/${selectedCurrency.substring(0, 2).toLowerCase()}.webp`}
           alt=""
         />
         {selectedCurrency}
