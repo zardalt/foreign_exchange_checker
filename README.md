@@ -1,75 +1,53 @@
-# React + TypeScript + Vite
+# Foreign Exchange Converter
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a site powered by the Frankfurter currency exchange API used to convert from one currency to another and also compare a currency with other currencies. It is bui;t mainly with React and Typescript.
 
-Currently, two official plugins are available:
+## Technologies
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+`React`
+`Typescript`
+`Vite`
+`Tailwind`
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+  - Convert a certain amount from one currency to another with live rates in real-time
+  - View a line and area chart of the active pair's rate over a time range of 1 day, 1 week, 1 month, 3 months, 1 year and 5 years
+  - Compare the rate of a currency with a range of other currencies at once.
+  - Pin and unpin a currency pair to favorites with it's live rate and 24 hr change.
+  - Log conversions to the Conversion Log
 
-## Expanding the ESLint configuration
+## The Process
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+This site was built with React and Typescript.  The first thing I did was to create the necessary utilities and define variables for the colors used in the site. I also used CSS's font-face at-rule to define and import the fonts.
+I utilized React Context to group related data 
+together and avoid prop drilling. The chart in the History Tab was made with the Chartjs package and most network requests were done with React's use hook.
+This enables loading with Suspense and I then used React's Error Boundary component to handle errors caused by failed network requests. The Frankfurter currency exchange API was used to get the current rates for a certain currency pair as well as the rate at a specific period.
+The localStorage API was used to persist favorited currency pairs and also logged conversions. I finally added the ability to specify the base and the quote in the URL.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### What I Learned
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+From building this site, I used React's `Context` and the `useContext` hook for the first time. I also utilized the `use` hook to handle fetch requests and when paired with the `Suspense` component, create loading states. So just from this site, I learned and used:
+- React's use hook
+- React's Suspense component
+- React's Error Boundary
+- Chartjs - for creating charts and graphs
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Useful Resources
 
-```
+[Tailwind Docs](https://tailwindcss.com) - For quickly looking up tailwind utilities
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+### AI Collaboration
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+No AI was used in this project as I am still learning and wanted to code everything myself. In later projects, I might utilize AI.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Screenshot
+!\[](./image.png)
 
-```
+## Video
+!\[](./trimmed_version.mp4)
+
+## Author
+- Frontend Mentor - [@zardalt](https://www.frontendmentor.io/profile/zardalt)
+- Twitter - [zardalt_](https://x.com/zardalt_)
+- Linkedin - [akanimo-udoh](https://www.linkedin.com/in/akanimo-udoh-348942437/)
