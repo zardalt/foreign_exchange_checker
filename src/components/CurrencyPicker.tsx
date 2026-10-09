@@ -65,7 +65,7 @@ const CurrencyGroup: React.FC<CurrencyGroupProp> = ({
           >
             <img
               className="size-5 rounded-full"
-              src={`/flags/${currency.iso_code.substring(0, 2).toLowerCase()}.webp`}
+              src={`${import.meta.env.BASE_URL}flags/${currency.iso_code.substring(0, 2).toLowerCase()}.webp`}
               alt=""
             />
             <span className="text-preset-4 text-neutral-50">
