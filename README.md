@@ -42,10 +42,14 @@ From building this site, I used React's `Context` and the `useContext` hook for 
 No AI was used in this project as I am still learning and wanted to code everything myself. In later projects, I might utilize AI.
 
 ## Screenshot
-!\[](./image.png)
+![](./image.png)
 
 ## Video
-!\[](./trimmed_version.mp4)
+![](./trimmed_version.mp4)
+
+## Links
+- Solution URL - [https://github.com/zardalt/foreign_exchange_checker](https://github.com/zardalt/foreign_exchange_checker)
+- Live Site URL - [https://zardalt.github.io/foreign_exchange_checker](https://zardalt.github.io/foreign_exchange_checker)
 
 ## Author
 - Frontend Mentor - [@zardalt](https://www.frontendmentor.io/profile/zardalt)
